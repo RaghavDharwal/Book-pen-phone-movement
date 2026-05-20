@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Car Bike Swap Puzzle</title>
+    <link
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+    />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@500;700&family=Nunito:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="glow glow-one" aria-hidden="true"></div>
+    <div class="glow glow-two" aria-hidden="true"></div>
+
+    <main class="app-shell">
+      <header class="hero panel">
+        <p class="eyebrow">Forward Move Puzzle</p>
+        <h1>17 Books, 16 Positions, 1 Empty Spot</h1>
+        <p class="intro">
+          Eight CARS start on the left side, eight BIKES on the right side,
+          and one middle spot is empty. Goal: swap the two sides using only valid moves.
+        </p>
+      </header>
+
+      <section class="panel rules-panel">
+        <h2>Rules</h2>
+        <ul>
+          <li>No backward movement.</li>
+          <li>One-step forward move into the empty place is allowed.</li>
+          <li>When a CAR and BIKE are adjacent, a forward exchange jump over one position is allowed.</li>
+        </ul>
+      </section>
+
+      <section class="panel board-panel">
+        <div class="legend" aria-label="Puzzle legend">
+          <span class="legend-chip car">Car names move right</span>
+          <span class="legend-chip bike">Bike names move left</span>
+          <span class="legend-chip empty">Empty = Open Book</span>
+        </div>
+
+        <div class="board-scroll">
+          <div id="board" class="board" aria-label="17 book positions"></div>
+        </div>
+
+        <p id="moveDetail" class="move-detail">Loading puzzle...</p>
+
+        <div class="status-grid">
+          <div>
+            <span class="status-label">Step</span>
+            <strong id="stepCounter" class="status-value">0 / 0</strong>
+          </div>
+          <div>
+            <span class="status-label">State</span>
+            <strong id="stateLabel" class="status-value">Ready</strong>
+          </div>
+          <div>
+            <span class="status-label">Minimum Moves</span>
+            <strong id="minMoves" class="status-value">0</strong>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button id="resetBtn" type="button">Reset</button>
+          <button id="prevBtn" type="button">Prev</button>
+          <button id="stepBtn" type="button">Next Step</button>
+          <button id="autoBtn" type="button">Auto Play</button>
+        </div>
+
+        <div class="controls export-controls">
+          <button id="exportAllPdfBtn" type="button">Export All Moves PDF</button>
+          <button id="exportCarsPdfBtn" type="button">Export Cars PDF</button>
+          <button id="exportBikesPdfBtn" type="button">Export Bikes PDF</button>
+        </div>
+
+        <label class="speed" for="speedInput">
+          Playback speed
+          <input
+            id="speedInput"
+            type="range"
+            min="120"
+            max="900"
+            step="20"
+            value="340"
+          />
+          <span id="speedValue">340 ms</span>
+        </label>
+      </section>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+    <script src="app.js" defer></script>
+  </body>
+</html>

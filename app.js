@@ -254,13 +254,12 @@
     return `${name.slice(0, maxChars - 1)}.`;
   }
 
-  function drawMovementArrow(doc, startX, startY, endX, endY, rgb) {
+  function drawMovementArrow(doc, startX, startY, endX, endY, rgb, arrowSize = 5) {
     const [r, g, b] = rgb;
     doc.setDrawColor(r, g, b);
     doc.setLineWidth(1.3);
     doc.line(startX, startY, endX, endY);
 
-    const arrowSize = 5;
     const angle = Math.atan2(endY - startY, endX - startX);
     const leftX = endX - arrowSize * Math.cos(angle - Math.PI / 8);
     const leftY = endY - arrowSize * Math.sin(angle - Math.PI / 8);
@@ -274,18 +273,11 @@
     doc.setDrawColor(80, 80, 80);
   }
 
-  function drawPdfStateBoard(doc, { x, y, width, title, snapshot, moveArrow = null }) {
+  function drawPdfStateBoard(doc, { x, y, width, snapshot, moveArrow = null, slotHeight = 44 }) {
     const slotCount = snapshot.length;
-    const gap = 3;
+    const gap = 1.6;
     const slotWidth = (width - gap * (slotCount - 1)) / slotCount;
-    const slotHeight = 56;
-    const titleHeight = 11;
-    const boardY = y + titleHeight;
-
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(8.5);
-    doc.setTextColor(31, 47, 47);
-    doc.text(title, x, y + 8);
+    const boardY = y;
 
     doc.setLineWidth(0.55);
     doc.setDrawColor(195, 183, 156);
@@ -304,10 +296,10 @@
 
       if (tokenId) {
         const isCar = tokenId.startsWith("c");
-        const tokenX = slotX + 2.2;
-        const tokenY = isCar ? boardY + 7 : boardY + slotHeight - 19;
-        const tokenWidth = slotWidth - 4.4;
-        const tokenHeight = 12;
+        const tokenX = slotX + 1.1;
+        const tokenWidth = slotWidth - 2.2;
+        const tokenHeight = Math.max(7, Math.min(10, slotHeight * 0.24));
+        const tokenY = isCar ? boardY + 4.3 : boardY + slotHeight - tokenHeight - 4.3;
 
         if (isCar) {
           doc.setFillColor(24, 125, 109);
@@ -320,20 +312,20 @@
         doc.roundedRect(tokenX, tokenY, tokenWidth, tokenHeight, 6, 6, "FD");
 
         const fullName = tokenNameFromId(tokenId);
-        const label = compactVehicleName(fullName, 7);
+        const label = tokenId.toUpperCase();
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(5.4);
+        doc.setFontSize(4.4);
         doc.setTextColor(248, 252, 252);
         const textWidth = doc.getTextWidth(label);
-        doc.text(label, tokenX + (tokenWidth - textWidth) / 2, tokenY + 8.1);
+        doc.text(label, tokenX + (tokenWidth - textWidth) / 2, tokenY + tokenHeight * 0.68);
       }
 
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(4.8);
+      doc.setFontSize(3.6);
       doc.setTextColor(94, 86, 67);
-      const bookLabel = `B${index + 1}`;
+      const bookLabel = String(index + 1);
       const labelWidth = doc.getTextWidth(bookLabel);
-      doc.text(bookLabel, slotX + (slotWidth - labelWidth) / 2, boardY + slotHeight - 2.5);
+      doc.text(bookLabel, slotX + (slotWidth - labelWidth) / 2, boardY + slotHeight - 1.4);
     }
 
     if (moveArrow) {
@@ -345,21 +337,58 @@
       const endX = x + toIndex * (slotWidth + gap) + slotWidth / 2;
       const arrowColor = moveArrow.tokenType === CAR ? [20, 116, 100] : [194, 72, 31];
 
-      drawMovementArrow(doc, startX, laneY, endX, laneY, arrowColor);
+      drawMovementArrow(doc, startX, laneY, endX, laneY, arrowColor, 3.8);
 
       const actionLabel = moveArrow.moveType === "slide" ? "slide" : "jump";
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(6.3);
+      doc.setFontSize(4.9);
       doc.setTextColor(58, 69, 69);
       const actionX = Math.min(startX, endX) + Math.abs(endX - startX) / 2 - doc.getTextWidth(actionLabel) / 2;
-      const actionY = moveArrow.tokenType === CAR ? laneY - 3.2 : laneY + 7;
+      const actionY = moveArrow.tokenType === CAR ? laneY - 2.3 : laneY + 5.4;
       doc.text(actionLabel, actionX, actionY);
     }
 
     doc.setTextColor(31, 47, 47);
     return {
-      height: titleHeight + slotHeight + 8,
+      height: slotHeight,
     };
+  }
+
+  function drawPdfMoveCard(doc, { x, y, width, height, entry }) {
+    doc.setFillColor(255, 252, 246);
+    doc.setDrawColor(211, 201, 183);
+    doc.setLineWidth(0.6);
+    doc.roundedRect(x, y, width, height, 4, 4, "FD");
+
+    const actionWord = entry.moveType === "slide" ? "slide" : "jump";
+    const title = `#${entry.step} ${entry.tokenType} ${compactVehicleName(entry.tokenName, 10)} ${entry.fromBook}->${entry.toBook}`;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(7.1);
+    doc.setTextColor(34, 56, 56);
+    doc.text(title, x + 6, y + 10);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(6.2);
+    doc.text(actionWord, x + width - 23, y + 10);
+
+    const boardInset = 6;
+    const boardY = y + 13;
+    const boardHeight = Math.max(38, height - 18);
+
+    drawPdfStateBoard(doc, {
+      x: x + boardInset,
+      y: boardY,
+      width: width - boardInset * 2,
+      snapshot: entry.beforeSnapshot,
+      moveArrow: {
+        tokenType: entry.tokenType,
+        moveType: entry.moveType,
+        fromBook: entry.fromBook,
+        toBook: entry.toBook,
+      },
+      slotHeight: boardHeight,
+    });
   }
 
   function buildMovementLog(moves, snapshots) {
@@ -412,108 +441,82 @@
       scope === "ALL" ? movementLog : movementLog.filter((entry) => entry.tokenType === scope);
 
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ unit: "pt", format: "a4", orientation: "landscape" });
+    const doc = new jsPDF({ unit: "pt", format: "a4", orientation: "portrait" });
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-    const sidePadding = 26;
+    const sidePadding = 18;
+    const topPadding = 18;
+    const bottomPadding = 18;
+    const headerHeight = 26;
     const contentWidth = pageWidth - sidePadding * 2;
-    let y = 30;
 
-    const drawPageHeader = (continued = false) => {
+    const columns = 2;
+    const rows = 8;
+    const movesPerPage = columns * rows;
+    const colGap = 10;
+    const rowGap = 6;
+
+    const cardWidth = (contentWidth - colGap) / columns;
+    const cardHeight =
+      (pageHeight - topPadding - bottomPadding - headerHeight - rowGap * (rows - 1)) / rows;
+
+    const pageCount = Math.max(1, Math.ceil(selectedMoves.length / movesPerPage));
+
+    const drawPageHeader = (pageNumber, startIndex, endIndex) => {
+      const headerY = topPadding;
+
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(16);
-      doc.setTextColor(26, 50, 50);
-      doc.text("Book Swap Puzzle Visual Movement Report", sidePadding, y);
-      y += 20;
+      doc.setFontSize(12.5);
+      doc.setTextColor(27, 51, 51);
+      doc.text(`Book Swap Visual Moves (${scopeTitle})`, sidePadding, headerY + 10);
 
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(10.2);
-      doc.text(`Report Type: ${scopeTitle}${continued ? " (continued)" : ""}`, sidePadding, y);
-      y += 13;
+      doc.setFontSize(8.3);
+      doc.text(
+        `A4 PDF | Page ${pageNumber} / ${pageCount} | Moves ${startIndex}-${endIndex} of ${selectedMoves.length}`,
+        sidePadding,
+        headerY + 20,
+      );
 
-      if (!continued) {
-        doc.text(`Total Moves in Solution: ${movementLog.length}`, sidePadding, y);
-        y += 12;
-        doc.text(`Moves in This Export: ${selectedMoves.length}`, sidePadding, y);
-        y += 12;
-        doc.text(`Generated: ${new Date().toLocaleString()}`, sidePadding, y);
-        y += 12;
-      }
-
-      y += 6;
+      doc.setDrawColor(208, 200, 183);
+      doc.setLineWidth(0.6);
+      doc.line(sidePadding, headerY + headerHeight, sidePadding + contentWidth, headerY + headerHeight);
     };
-
-    const ensureSpace = (heightNeeded) => {
-      if (y + heightNeeded > pageHeight - 24) {
-        doc.addPage();
-        y = 30;
-        drawPageHeader(true);
-      }
-    };
-
-    drawPageHeader(false);
-
-    ensureSpace(90);
-    const initialBoard = drawPdfStateBoard(doc, {
-      x: sidePadding,
-      y,
-      width: contentWidth,
-      title: "Step 0 - Initial State",
-      snapshot: boardSnapshots[0],
-    });
-    y += initialBoard.height + 10;
 
     if (selectedMoves.length === 0) {
       doc.setFont("helvetica", "normal");
       doc.setFontSize(10);
       doc.setTextColor(52, 63, 63);
-      doc.text("No movement entries found for this filter.", sidePadding, y);
+      doc.text("No movement entries found for this filter.", sidePadding, 46);
       doc.save(fileName);
       return;
     }
 
-    for (const entry of selectedMoves) {
-      ensureSpace(176);
+    for (let page = 0; page < pageCount; page += 1) {
+      if (page > 0) {
+        doc.addPage();
+      }
 
-      const actionWord = entry.moveType === "slide" ? "slides" : "jumps";
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(10);
-      doc.setTextColor(35, 55, 55);
-      doc.text(
-        `Step ${entry.step}: ${entry.tokenType} ${entry.tokenName} ${actionWord} Book ${entry.fromBook} -> Book ${entry.toBook}`,
-        sidePadding,
-        y,
-      );
-      y += 10;
+      const start = page * movesPerPage;
+      const endExclusive = Math.min(start + movesPerPage, selectedMoves.length);
+      drawPageHeader(page + 1, start + 1, endExclusive);
 
-      const beforeBoard = drawPdfStateBoard(doc, {
-        x: sidePadding,
-        y,
-        width: contentWidth,
-        title: "Before Move",
-        snapshot: entry.beforeSnapshot,
-        moveArrow: {
-          tokenType: entry.tokenType,
-          moveType: entry.moveType,
-          fromBook: entry.fromBook,
-          toBook: entry.toBook,
-        },
-      });
-      y += beforeBoard.height + 4;
+      for (let i = start; i < endExclusive; i += 1) {
+        const indexInPage = i - start;
+        const row = Math.floor(indexInPage / columns);
+        const col = indexInPage % columns;
 
-      const afterBoard = drawPdfStateBoard(doc, {
-        x: sidePadding,
-        y,
-        width: contentWidth,
-        title: "After Move",
-        snapshot: entry.afterSnapshot,
-      });
-      y += afterBoard.height + 10;
+        const x = sidePadding + col * (cardWidth + colGap);
+        const y = topPadding + headerHeight + row * (cardHeight + rowGap);
 
-      doc.setDrawColor(209, 201, 185);
-      doc.setLineWidth(0.45);
-      doc.line(sidePadding, y, sidePadding + contentWidth, y);
-      y += 8;
+        drawPdfMoveCard(doc, {
+          x,
+          y,
+          width: cardWidth,
+          height: cardHeight,
+          entry: selectedMoves[i],
+        });
+      }
     }
 
     doc.save(fileName);

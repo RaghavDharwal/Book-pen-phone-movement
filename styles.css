@@ -319,6 +319,25 @@ button {
   transition: transform 170ms ease, box-shadow 170ms ease, filter 170ms ease;
 }
 
+.action-link {
+  border: 1px solid #c8bca9;
+  background: linear-gradient(175deg, #fffef9, #f0e4cf);
+  border-radius: 999px;
+  padding: 0.5rem 0.95rem;
+  font: inherit;
+  font-weight: 700;
+  color: #2d4948;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.action-link:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 16px rgba(52, 62, 62, 0.16);
+  filter: saturate(1.05);
+}
+
 button:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow: 0 10px 16px rgba(52, 62, 62, 0.16);

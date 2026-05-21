@@ -1,0 +1,229 @@
+:root {
+  --bg-a: #f6efe3;
+  --bg-b: #e1f3ec;
+  --panel: #fffaf2;
+  --ink: #223534;
+  --muted: #5b6d6b;
+  --line: #d6cdbd;
+  --car: #157a6e;
+  --bike: #157a6e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Nunito", "Segoe UI", sans-serif;
+  color: var(--ink);
+  background: linear-gradient(145deg, var(--bg-a), var(--bg-b));
+}
+
+.shell {
+  width: min(1320px, 96vw);
+  margin: 1.4rem auto 2rem;
+}
+
+.panel {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 250, 242, 0.95);
+  box-shadow: 0 14px 28px rgba(34, 53, 52, 0.1);
+  padding: 1rem 1.1rem;
+}
+
+.rules,
+.board-panel {
+  margin-top: 0.9rem;
+}
+
+.eyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #3f6c6a;
+}
+
+h1,
+h2 {
+  font-family: "Archivo Expanded", "Arial Black", sans-serif;
+  margin: 0.5rem 0;
+}
+
+.hero p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.rules ul {
+  margin: 0;
+  padding-left: 1rem;
+  display: grid;
+  gap: 0.3rem;
+  color: #475856;
+}
+
+.status {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.status > div {
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  padding: 0.5rem 0.6rem;
+  background: rgba(255, 255, 255, 0.65);
+}
+
+.label {
+  display: block;
+  font-size: 0.73rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #647272;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(17, minmax(2.15rem, 1fr));
+  gap: 0.38rem;
+}
+
+.slot {
+  position: relative;
+  height: 6rem;
+  border-radius: 0.55rem 0.55rem 0.3rem 0.3rem;
+  border: 1px solid #d8cdb8;
+  background: linear-gradient(175deg, #f6ecdc 0%, #ecdcc0 65%, #e4d0aa 100%);
+  box-shadow: inset 0 -6px 11px rgba(117, 78, 20, 0.09);
+  display: flex;
+  justify-content: center;
+}
+
+.slot::after {
+  content: "";
+  position: absolute;
+  left: 0.45rem;
+  right: 0.45rem;
+  top: 52%;
+  border-top: 1px dashed rgba(128, 95, 48, 0.4);
+  pointer-events: none;
+}
+
+.slot.empty {
+  border-style: dashed;
+}
+
+.token-holder {
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.14rem;
+}
+
+.token {
+  width: calc(100% - 0.14rem);
+  max-width: 4.5rem;
+  height: 1.35rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  color: #f5fffd;
+  font-size: 0.54rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 7px 14px rgba(23, 35, 35, 0.16);
+  cursor: grab;
+}
+
+.token:active {
+  cursor: grabbing;
+}
+
+.token.car,
+.token.bike {
+  background: linear-gradient(170deg, #22ab9a, #157a6e);
+  border-color: #0f6157;
+  align-self: center;
+  margin: 0;
+}
+
+.book-label {
+  position: absolute;
+  bottom: 0.18rem;
+  width: 100%;
+  text-align: center;
+  font-size: 0.58rem;
+  color: #6b614d;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.actions {
+  margin-top: 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+button,
+.home-link {
+  border: 1px solid #c9bcaa;
+  border-radius: 999px;
+  padding: 0.48rem 0.9rem;
+  background: linear-gradient(175deg, #fffef9, #f1e4ce);
+  color: #2c4948;
+  text-decoration: none;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.popup {
+  position: fixed;
+  left: 50%;
+  bottom: 1.2rem;
+  transform: translateX(-50%) translateY(20px);
+  border-radius: 999px;
+  background: #223534;
+  color: #f4fbf9;
+  padding: 0.6rem 1rem;
+  font-weight: 700;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.popup.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+@media (max-width: 780px) {
+  .board {
+    overflow-x: auto;
+    grid-template-columns: repeat(17, minmax(2rem, 2.7rem));
+  }
+
+  .slot {
+    height: 5.1rem;
+  }
+
+  .token {
+    font-size: 0.48rem;
+    height: 1.2rem;
+  }
+
+}

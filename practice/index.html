@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Practice Mode - Book Car Bike Puzzle</title>
+    <link
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+    />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@500;700&family=Nunito:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./practice.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="panel hero">
+        <p class="eyebrow">/practice</p>
+        <h1>Practice Mode</h1>
+        <p>
+          Drag vehicles only to valid positions. This mode checks your moves against the correct
+          solution path. One wrong move means you lose and the board resets automatically.
+        </p>
+      </header>
+
+      <section class="panel rules">
+        <h2>Rules</h2>
+        <ul>
+          <li>Cars move only right (one step or jump over one bike).</li>
+          <li>Bikes move only left (one step or jump over one car).</li>
+          <li>No backward movement.</li>
+          <li>Wrong move => popup "You lost" + auto reset.</li>
+        </ul>
+      </section>
+
+      <section class="panel board-panel">
+        <div class="status">
+          <div>
+            <span class="label">Step</span>
+            <strong id="stepValue">0 / 80</strong>
+          </div>
+          <div>
+            <span class="label">State</span>
+            <strong id="stateValue">Start</strong>
+          </div>
+        </div>
+
+        <div id="practiceBoard" class="board" aria-label="Practice board"></div>
+
+        <div class="actions">
+          <button id="resetBtn" type="button">Reset Practice</button>
+          <a class="home-link" href="../index.html">Back To Visualizer</a>
+        </div>
+      </section>
+    </main>
+
+    <div id="popup" class="popup" role="status" aria-live="polite"></div>
+
+    <script src="./practice.js" defer></script>
+  </body>
+</html>
